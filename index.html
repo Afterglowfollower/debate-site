@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>舆论监督权四重证成 · AI 多智能体辩论实录</title>
+<style>
+  :root {
+    --bg: #fdfaf4;
+    --bg-card: #ffffff;
+    --ink: #1a202c;
+    --ink-muted: #4a5568;
+    --ink-faint: #a0aec0;
+    --border: #e2e8f0;
+    --accent: #2d3748;
+    --arendt: #4a5568;
+    --habermas: #2c5282;
+    --bentham: #744210;
+    --schudson: #742a2a;
+    --shadow: 0 2px 12px rgba(26, 32, 44, 0.06);
+    --shadow-hover: 0 6px 24px rgba(26, 32, 44, 0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Georgia", "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* ===== Hero ===== */
+  header.hero {
+    padding: 60px 24px 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #fdfaf4 0%, #faf6ec 100%);
+  }
+  .hero-eyebrow {
+    font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--ink-muted); margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-size: 36px; font-weight: 700; letter-spacing: 0.02em;
+    margin-bottom: 12px; line-height: 1.3;
+  }
+  .hero-subtitle {
+    font-size: 17px; color: var(--ink-muted); max-width: 720px; margin: 0 auto 24px;
+  }
+  .hero-meta {
+    display: inline-flex; gap: 24px; font-size: 13px; color: var(--ink-faint);
+    flex-wrap: wrap; justify-content: center;
+  }
+  .hero-meta span::before { content: "·"; margin-right: 8px; color: var(--ink-faint); }
+  .hero-meta span:first-child::before { content: ""; margin: 0; }
+
+  /* ===== Section ===== */
+  section { padding: 56px 0; border-bottom: 1px solid var(--border); }
+  .section-title {
+    display: flex; align-items: baseline; gap: 16px;
+    margin-bottom: 32px; padding-bottom: 12px; border-bottom: 2px solid var(--ink);
+  }
+  .section-title h2 { font-size: 24px; font-weight: 700; }
+  .section-title .counter {
+    font-family: "Georgia", serif; font-style: italic;
+    color: var(--ink-faint); font-size: 14px;
+  }
+  .section-title .meta { margin-left: auto; color: var(--ink-muted); font-size: 14px; }
+
+  /* ===== Thinker overview grid ===== */
+  .thinkers-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    margin-bottom: 40px;
+  }
+  @media (max-width: 900px) { .thinkers-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px) { .thinkers-grid { grid-template-columns: 1fr; } }
+  .thinker-card {
+    background: var(--bg-card); border-radius: 8px; padding: 20px;
+    border: 1px solid var(--border); border-top: 4px solid var(--c, var(--ink));
+    transition: all 0.2s ease; cursor: default;
+  }
+  .thinker-card .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--c, var(--ink)); color: white; display: flex;
+    align-items: center; justify-content: center;
+    font-weight: 700; font-size: 11px; letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+  .thinker-card h3 { font-size: 17px; margin-bottom: 4px; }
+  .thinker-card .name-en { font-size: 12px; color: var(--ink-faint); font-style: italic; margin-bottom: 10px; }
+  .thinker-card .role { font-size: 13px; color: var(--ink-muted); }
+
+  /* ===== Rounds nav ===== */
+  .rounds-nav {
+    display: flex; gap: 2px; background: var(--border); border-radius: 8px;
+    padding: 2px; margin-bottom: 24px; overflow-x: auto;
+  }
+  .rounds-nav button {
+    flex: 1; padding: 12px 16px; border: none; background: transparent;
+    font-family: inherit; font-size: 14px; cursor: pointer;
+    border-radius: 6px; transition: all 0.15s ease;
+    color: var(--ink-muted); white-space: nowrap;
+  }
+  .rounds-nav button.active {
+    background: var(--bg-card); color: var(--ink); box-shadow: var(--shadow);
+    font-weight: 600;
+  }
+  .rounds-nav button:hover:not(.active) { color: var(--ink); }
+  .round-subtitle {
+    text-align: center; color: var(--ink-muted); font-size: 14px;
+    font-style: italic; margin-bottom: 32px;
+  }
+
+  /* ===== Pieces grid (one piece per thinker per round) ===== */
+  .pieces-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+  }
+  @media (max-width: 1000px) { .pieces-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .pieces-grid { grid-template-columns: 1fr; } }
+  .piece-card {
+    background: var(--bg-card); border-radius: 8px; padding: 20px;
+    border: 1px solid var(--border); border-left: 4px solid var(--c, var(--ink));
+    cursor: pointer; transition: all 0.2s ease;
+    display: flex; flex-direction: column; min-height: 180px;
+  }
+  .piece-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+  .piece-card .piece-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  }
+  .piece-card .avatar-sm {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--c, var(--ink)); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 9px;
+  }
+  .piece-card .piece-head .name { font-weight: 600; font-size: 14px; }
+  .piece-card .preview {
+    font-size: 13px; color: var(--ink-muted); line-height: 1.6;
+    overflow: hidden; display: -webkit-box;
+    -webkit-line-clamp: 5; -webkit-box-orient: vertical;
+    flex: 1;
+  }
+  .piece-card .read-more {
+    margin-top: 12px; font-size: 12px; color: var(--c, var(--ink));
+    font-weight: 600; letter-spacing: 0.03em;
+  }
+
+  /* ===== Modal ===== */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(26,32,44,0.5);
+    display: none; align-items: center; justify-content: center;
+    padding: 24px; z-index: 100;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-backdrop.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--bg-card); border-radius: 10px;
+    max-width: 820px; width: 100%; max-height: 90vh;
+    overflow-y: auto; position: relative;
+    border-top: 6px solid var(--c, var(--ink));
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .modal-header {
+    padding: 24px 32px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 16px; position: sticky; top: 0;
+    background: var(--bg-card); z-index: 1;
+  }
+  .modal-header .avatar-lg {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--c, var(--ink)); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; flex-shrink: 0;
+  }
+  .modal-header .titles h3 { font-size: 20px; margin-bottom: 4px; }
+  .modal-header .titles .sub { font-size: 13px; color: var(--ink-muted); }
+  .modal-close {
+    margin-left: auto; width: 36px; height: 36px; border-radius: 50%;
+    background: var(--bg); border: 1px solid var(--border);
+    cursor: pointer; font-size: 18px; display: flex; align-items: center;
+    justify-content: center; color: var(--ink-muted);
+  }
+  .modal-close:hover { background: var(--border); color: var(--ink); }
+  .modal-body {
+    padding: 32px; font-size: 15px; line-height: 1.85;
+  }
+  .modal-body h1, .modal-body h2, .modal-body h3, .modal-body h4 {
+    margin-top: 24px; margin-bottom: 12px; line-height: 1.3;
+  }
+  .modal-body h1 { font-size: 22px; }
+  .modal-body h2 { font-size: 18px; color: var(--c, var(--ink)); }
+  .modal-body h3 { font-size: 16px; color: var(--ink-muted); }
+  .modal-body p { margin-bottom: 14px; }
+  .modal-body ul { margin: 10px 0 14px 20px; }
+  .modal-body li { margin-bottom: 6px; }
+  .modal-body code {
+    background: var(--bg); padding: 2px 6px; border-radius: 3px;
+    font-size: 0.9em; font-family: "Menlo", monospace;
+  }
+  .modal-body strong { font-weight: 700; }
+
+  /* ===== Final docs section ===== */
+  .docs-tabs {
+    display: flex; gap: 8px; margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .docs-tabs button {
+    padding: 12px 20px; background: transparent; border: none; border-bottom: 2px solid transparent;
+    font-family: inherit; font-size: 15px; cursor: pointer; color: var(--ink-muted);
+    transition: all 0.15s ease;
+  }
+  .docs-tabs button.active {
+    color: var(--ink); border-bottom-color: var(--ink); font-weight: 600;
+  }
+  .doc-content {
+    background: var(--bg-card); border-radius: 8px; padding: 32px 40px;
+    border: 1px solid var(--border);
+    font-size: 15px; line-height: 1.85;
+    max-height: 70vh; overflow-y: auto;
+  }
+  .doc-content h1, .doc-content h2, .doc-content h3 {
+    margin-top: 24px; margin-bottom: 12px;
+  }
+  .doc-content h1 { font-size: 22px; }
+  .doc-content h2 { font-size: 18px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .doc-content h3 { font-size: 15px; color: var(--ink-muted); }
+  .doc-content p { margin-bottom: 14px; }
+  .doc-content ul { margin: 10px 0 14px 20px; }
+  .doc-content li { margin-bottom: 6px; }
+  .doc-content strong { font-weight: 700; }
+  .doc-content em { font-style: italic; color: var(--ink-muted); }
+  .doc-content code { background: var(--bg); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+  .doc-content a { color: var(--habermas); }
+
+  footer {
+    padding: 40px 24px; text-align: center;
+    font-size: 13px; color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-eyebrow">AI 多智能体辩论实录</div>
+  <h1>舆论监督权四重证成</h1>
+  <p class="hero-subtitle">
+    四位思想家(阿伦特 · 哈贝马斯 · 边沁 · 舒德森)与五位国内学者(石毕凡 · 侯健 · 李洋 · 郭道晖 · 刘练军)跨越四轮的联合证成
+  </p>
+  <div class="hero-meta">
+    <span>Claude Opus 4.7 + 3× Hermes (glm-5.2)</span>
+    <span>4 位思想家 × 4 轮讨论 = 16 篇</span>
+    <span>约 15,000 字原始辩论稿</span>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- Thinkers overview -->
+  <section>
+    <div class="section-title">
+      <h2>四位对话者</h2>
+      <span class="counter">The Four Interlocutors</span>
+    </div>
+    <div class="thinkers-grid" id="thinkers-grid"></div>
+  </section>
+
+  <!-- Rounds -->
+  <section>
+    <div class="section-title">
+      <h2>四轮辩论</h2>
+      <span class="counter">R1 → R4</span>
+      <span class="meta">点击任意卡片展开全文</span>
+    </div>
+    <div class="rounds-nav" id="rounds-nav"></div>
+    <div class="round-subtitle" id="round-subtitle"></div>
+    <div class="pieces-grid" id="pieces-grid"></div>
+  </section>
+
+  <!-- Final docs: synthesis / reflection / scholarship -->
+  <section>
+    <div class="section-title">
+      <h2>汇总与附录</h2>
+      <span class="counter">Final Documents</span>
+    </div>
+    <div class="docs-tabs" id="docs-tabs"></div>
+    <div class="doc-content" id="doc-content"></div>
+  </section>
+
+</main>
+
+<footer>
+  本页由 Claude 协作生成 · 四位思想家持久化 Skill 来自 K-Dense-AI/mimeographs(Arendt)及自建(Habermas/Bentham/Schudson)· 2026
+</footer>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="avatar-lg" id="modal-avatar"></div>
+      <div class="titles">
+        <h3 id="modal-title"></h3>
+        <div class="sub" id="modal-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+  const colorMap = {
+    "hannah-arendt":    { c: "#4a5568" },
+    "jurgen-habermas":  { c: "#2c5282" },
+    "jeremy-bentham":   { c: "#744210" },
+    "michael-schudson": { c: "#742a2a" },
+  };
+
+  // Thinkers grid
+  const tgrid = document.getElementById('thinkers-grid');
+  DATA.thinkers.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'thinker-card';
+    el.style.setProperty('--c', colorMap[t.slug].c);
+    el.innerHTML = `
+      <div class="avatar">${t.icon}</div>
+      <h3>${t.name_cn}</h3>
+      <div class="name-en">${t.name_en}</div>
+      <div class="role">${t.role}</div>
+    `;
+    tgrid.appendChild(el);
+  });
+
+  // Rounds nav
+  const rnav = document.getElementById('rounds-nav');
+  const roundSubtitle = document.getElementById('round-subtitle');
+  const pgrid = document.getElementById('pieces-grid');
+  let currentRound = 0;
+
+  function stripHtml(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent.replace(/\s+/g, ' ').trim();
+  }
+
+  function renderRound(idx) {
+    currentRound = idx;
+    document.querySelectorAll('.rounds-nav button').forEach((b, i) => {
+      b.classList.toggle('active', i === idx);
+    });
+    const r = DATA.rounds[idx];
+    roundSubtitle.textContent = r.subtitle;
+    pgrid.innerHTML = '';
+    DATA.thinkers.forEach(t => {
+      const html = r.pieces[t.slug] || '<p><em>未出稿</em></p>';
+      const preview = stripHtml(html).slice(0, 180) + '…';
+      const el = document.createElement('div');
+      el.className = 'piece-card';
+      el.style.setProperty('--c', colorMap[t.slug].c);
+      el.innerHTML = `
+        <div class="piece-head">
+          <div class="avatar-sm" style="background:${colorMap[t.slug].c}">${t.icon}</div>
+          <div class="name">${t.name_cn}</div>
+        </div>
+        <div class="preview">${preview}</div>
+        <div class="read-more">阅读全文 →</div>
+      `;
+      el.onclick = () => openModal(r, t, html);
+      pgrid.appendChild(el);
+    });
+  }
+
+  DATA.rounds.forEach((r, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = r.title;
+    btn.onclick = () => renderRound(i);
+    rnav.appendChild(btn);
+  });
+  renderRound(0);
+
+  // Modal
+  function openModal(round, thinker, html) {
+    document.getElementById('modal-avatar').textContent = thinker.icon;
+    document.getElementById('modal-avatar').style.background = colorMap[thinker.slug].c;
+    document.getElementById('modal-title').textContent = `${thinker.name_cn} · ${round.title.replace(/^第\S+轮·?\s*/, '')}`;
+    document.getElementById('modal-sub').textContent = `${thinker.name_en} — ${thinker.role}`;
+    document.getElementById('modal-body').innerHTML = html;
+    document.querySelector('.modal').style.setProperty('--c', colorMap[thinker.slug].c);
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // Docs tabs
+  const docsTabs = document.getElementById('docs-tabs');
+  const docContent = document.getElementById('doc-content');
+  const docs = [
+    { id: 'synthesis',   label: '📄 课程论文(汇总稿)', content: DATA.synthesis },
+    { id: 'reflection',  label: '📝 写作手记',          content: DATA.reflection },
+    { id: 'scholarship', label: '📚 国内学理综述',       content: DATA.scholarship },
+  ];
+  docs.forEach((d, i) => {
+    const b = document.createElement('button');
+    b.textContent = d.label;
+    b.onclick = () => showDoc(i);
+    docsTabs.appendChild(b);
+  });
+  function showDoc(i) {
+    document.querySelectorAll('.docs-tabs button').forEach((b, j) => b.classList.toggle('active', j === i));
+    docContent.innerHTML = docs[i].content || '<p><em>内容为空</em></p>';
+    docContent.scrollTop = 0;
+  }
+  showDoc(0);
+</script>
+
+</body>
+</html>
