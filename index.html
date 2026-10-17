@@ -278,13 +278,13 @@
     <div class="pieces-grid" id="pieces-grid"></div>
   </section>
 
-  <!-- Final docs: synthesis / reflection / scholarship -->
+  <!-- Appendix: scholarship -->
   <section>
     <div class="section-title">
-      <h2>汇总与附录</h2>
-      <span class="counter">Final Documents</span>
+      <h2>附录 · 国内学理综述</h2>
+      <span class="counter">Chinese Scholarship</span>
+      <span class="meta">Hermes web_search 实时检索,5 篇</span>
     </div>
-    <div class="docs-tabs" id="docs-tabs"></div>
     <div class="doc-content" id="doc-content"></div>
   </section>
 
@@ -397,26 +397,8 @@
   }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-  // Docs tabs
-  const docsTabs = document.getElementById('docs-tabs');
-  const docContent = document.getElementById('doc-content');
-  const docs = [
-    { id: 'synthesis',   label: '📄 课程论文(汇总稿)', content: DATA.synthesis },
-    { id: 'reflection',  label: '📝 写作手记',          content: DATA.reflection },
-    { id: 'scholarship', label: '📚 国内学理综述',       content: DATA.scholarship },
-  ];
-  docs.forEach((d, i) => {
-    const b = document.createElement('button');
-    b.textContent = d.label;
-    b.onclick = () => showDoc(i);
-    docsTabs.appendChild(b);
-  });
-  function showDoc(i) {
-    document.querySelectorAll('.docs-tabs button').forEach((b, j) => b.classList.toggle('active', j === i));
-    docContent.innerHTML = docs[i].content || '<p><em>内容为空</em></p>';
-    docContent.scrollTop = 0;
-  }
-  showDoc(0);
+  // Scholarship appendix (no tabs — single section)
+  document.getElementById('doc-content').innerHTML = DATA.scholarship || '<p><em>内容为空</em></p>';
 </script>
 
 </body>
